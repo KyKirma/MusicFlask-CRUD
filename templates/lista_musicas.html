@@ -19,4 +19,13 @@
         {% endfor %}
     </tbody>
 </table>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class='list-unstyled' id="messages">
+        {% for message in messages %}
+            <li class="alert alert-success">{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
 {% endblock %}
