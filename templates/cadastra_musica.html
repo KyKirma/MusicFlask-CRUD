@@ -7,18 +7,27 @@
 
         <div class="mb-2">
             <label for="txtNomeMusica">Nome da Música:</label>
-            <input type="text" name="txtNomeMusica" id="txtNomeMusica" class="form-control">
+            <input type="text" name="txtNomeMusica" id="txtNomeMusica" class="form-control" required>
         </div>
         <div class="mb-2">
             <label for="txtBanda">Banda:</label>
-            <input type="text" name="txtBanda" id="txtBanda" class="form-control">
+            <input type="text" name="txtBanda" id="txtBanda" class="form-control" required>
         </div>
         <div class="mb-2">
             <label for="txtGenero">Genero:</label>
-            <input type="text" name="txtGenero" id="txtGenero" class="form-control">
+            <input type="text" name="txtGenero" id="txtGenero" class="form-control" required>
         </div>
 
         <div class="mb-2"><button type="submit" class="btn btn-primary">Cadastrar Musica</button></div>
     </form>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class=flashes>
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
 </fieldset>
 {% endblock %}

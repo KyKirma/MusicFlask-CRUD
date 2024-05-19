@@ -4,31 +4,39 @@
     <meta charset="UTF-8">
     <title>Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename = 'bootstrap.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </head>
 <body>
-    <div class="container">
-        <form method="post" action="/autenticar">
-            <fieldset>
-                <div class="mb-2">
-                    <label for="txtLogin">Login</label>
-                    <input type="text" class="form-control" id="txtLogin" name="txtLogin">
+    <div class="container-fluid">
+        <div class="row gx-5 m-auto">
+            <div class="col">
+                <div class="card m-2">
+                    <form method="post" action="/autenticar" class="m-2">
+                        <fieldset>
+                            <div class="mb-2">
+                                <label for="txtLogin">Login</label>
+                                <input type="text" class="form-control" id="txtLogin" name="txtLogin" required>
+                            </div>
+                            <div class="mb-2">
+                                <label for="txtSenha">Senha</label>
+                                <input type="password" class="form-control" id="txtSenha" name="txtSenha" required>
+                            </div>
+                            {% with messages = get_flashed_messages(with_categories=true) %}
+                                {% if messages %}
+                                    <ul class=flashes>
+                                        {% for category, message in messages %}
+                                            <li class="{{ category }}">{{ message }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            {% endwith %}
+                            <div class="mb-2"><button type="submit" class="btn btn-primary">Logar</button></div>
+                        </fieldset>
+                    </form>
                 </div>
-                <div class="mb-2">
-                    <label for="txtSenha">Senha</label>
-                    <input type="password" class="form-control" id="txtSenha" name="txtSenha">
-                </div>
-                {% with messages = get_flashed_messages() %}
-                    {% if messages %}
-                        <ul class='list-unstyled' id="messages">
-                        {% for message in messages %}
-                            <li class="alert alert-danger">{{ message }}</li>
-                        {% endfor %}
-                        </ul>
-                    {% endif %}
-                {% endwith %}
-                <div class="mb-2"><button type="submit" class="btn btn-primary">Logar</button></div>
-            </fieldset>
-        </form>
+            </div>
+            
+        </div>
     </div>
 </body>
 </html>

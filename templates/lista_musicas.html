@@ -12,19 +12,19 @@
     <tbody>
         {% for musica in musicas %}
         <tr>
-            <td>{{ musica.nome }}</td>
-            <td>{{ musica.banda }}</td>
-            <td>{{ musica.genero }}</td>
+            <td>{{ musica.nome_musica }}</td>
+            <td>{{ musica.cantor_banda }}</td>
+            <td>{{ musica.genero_musica }}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
-{% with messages = get_flashed_messages() %}
+{% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-        <ul class='list-unstyled' id="messages">
-        {% for message in messages %}
-            <li class="alert alert-success">{{ message }}</li>
-        {% endfor %}
+        <ul class=flashes>
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
         </ul>
     {% endif %}
 {% endwith %}
