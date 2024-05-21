@@ -1,12 +1,12 @@
-from flask import render_template, request, redirect, session, flash, url_for
+from flask import render_template, request, redirect, session, flash, url_for, send_from_directory
 from models import Musica, Usuario
 from musica import db, app
+from definicoes import recupera_imagem
 
 @app.route('/')
 def listarMusicas():
-
-    if session['usuarioLogado'] == None or 'usuarioLogado' not in session:
-        return redirect('/login')
+    if 'usuarioLogado' not in session or session['usuarioLogado'] == None:
+        return redirect(url_for('loginUser'))
     
     lista = Musica.query.order_by(Musica.id_musica)
 
@@ -18,7 +18,7 @@ def listarMusicas():
 def cadastrarMusica():
 
     if session['usuarioLogado'] == None or 'usuarioLogado' not in session:
-        return redirect('/login')
+        return redirect(url_for('loginUser'))
 
     return render_template('cadastra_musica.html',
                            titulo = 'Cadastrar música')
@@ -36,8 +36,56 @@ def adicionarMusica():
         novaMusica = Musica(nome_musica = nome, cantor_banda = banda, genero_musica = genero)
         db.session.add(novaMusica)
         db.session.commit()
+
+        arquivo = request.files['arquivo']
+        pastaArquivos = app.config['UPLOAD_PASTA']
+        arquivo.save(f'{pastaArquivos}/album{novaMusica.id_musica}.jpg')
+
         flash("Musica cadastrada com sucesso", "alert alert-success")
         return redirect(url_for('cadastrarMusica'))
+
+@app.route('/editar/<int:id>')
+def editar(id):
+
+    if session['usuarioLogado'] == None or 'usuarioLogado' not in session:
+        return redirect(url_for('loginUser'))
+
+    musicaBuscada = Musica.query.filter_by(id_musica = id).first()
+    album = recupera_imagem(id)
+
+    return render_template('editar_musica.html',
+                           titulo = 'Editar música',
+                           musica = musicaBuscada,
+                           albumMusica = album)
+
+@app.route('/attMusica', methods = ['POST'])
+def atualizarMusica():
+    musica = Musica.query.filter_by(id_musica = request.form['txtId']).first()
+
+    musica.nome_musica = request.form['txtNomeMusica']
+    musica.cantor_banda = request.form['txtBanda']
+    musica.genero_musica = request.form['txtGenero']
+
+    db.session.add(musica)
+    db.session.commit()
+
+    return redirect(url_for('listarMusicas'))
+
+@app.route('/excluir/<int:id>')
+def excluir(id):
+
+    if 'usuarioLogado' not in session or session['usuarioLogado'] == None:
+        return redirect(url_for('loginUser'))
+    
+    Musica.query.filter_by(id_musica = id).delete()
+    db.session.commit()
+
+    flash("Musica excluida com sucesso", "alert alert-success")
+    return redirect(url_for('listarMusicas'))
+
+@app.route('/uploads/<nomeImagem>')
+def imagem(nomeImagem):
+    return send_from_directory('uploads', nomeImagem)
 
 @app.route('/login')
 def loginUser():

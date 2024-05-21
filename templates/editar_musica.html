@@ -3,25 +3,32 @@
 {% block conteudo %}
 <fieldset>
     <legend>Digite as informações da musica</legend>
-    <form method="post" action="/addMusica" enctype="multipart/form-data">
+    <form method="post" action="{{ url_for('atualizarMusica') }}">
+
+        <img src="{{ url_for('imagem', nomeImagem = albumMusica) }}" class="rounded" alt="album" style="height: 200px; width: 200px; max-width: 100%;">
+
+        <input type="hidden" name="txtId" value="{{ musica.id_musica }}">
         <div class="mb-2">
             <label for="arquivo">Foto de capa:</label>
             <input type="file" class="form-control" name="arquivo" accept=".jpg, .jpeg, .png">
         </div>
         <div class="mb-2">
             <label for="txtNomeMusica">Nome da Música:</label>
-            <input type="text" name="txtNomeMusica" id="txtNomeMusica" class="form-control" required>
+            <input type="text" name="txtNomeMusica" id="txtNomeMusica" class="form-control" required 
+            value="{{ musica.nome_musica }}">
         </div>
         <div class="mb-2">
             <label for="txtBanda">Banda:</label>
-            <input type="text" name="txtBanda" id="txtBanda" class="form-control" required>
+            <input type="text" name="txtBanda" id="txtBanda" class="form-control" required
+            value="{{ musica.cantor_banda }}">
         </div>
         <div class="mb-2">
             <label for="txtGenero">Genero:</label>
-            <input type="text" name="txtGenero" id="txtGenero" class="form-control" required>
+            <input type="text" name="txtGenero" id="txtGenero" class="form-control" required
+            value="{{ musica.genero_musica }}">
         </div>
 
-        <div class="mb-2"><button type="submit" class="btn btn-primary">Cadastrar Musica</button></div>
+        <div class="mb-2"><button type="submit" class="btn btn-primary">Editar</button></div>
     </form>
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}

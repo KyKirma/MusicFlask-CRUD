@@ -1,3 +1,5 @@
+import os
+
 SECRET_KEY = 'segredo'
 
 SQLALCHEMY_DATABASE_URI = \
@@ -8,3 +10,6 @@ SQLALCHEMY_DATABASE_URI = \
         servidor = 'localhost',
         database = 'playmusica'
     )
+
+
+UPLOAD_PASTA = os.path.dirname(os.path.abspath(__file__)) + '/uploads'
