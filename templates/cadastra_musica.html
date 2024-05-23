@@ -4,24 +4,30 @@
 <fieldset>
     <legend>Digite as informações da musica</legend>
     <form method="post" action="/addMusica" enctype="multipart/form-data">
-        <div class="mb-2">
-            <label for="arquivo">Foto de capa:</label>
-            <input type="file" class="form-control" name="arquivo" accept=".jpg, .jpeg, .png">
-        </div>
-        <div class="mb-2">
-            <label for="txtNomeMusica">Nome da Música:</label>
-            <input type="text" name="txtNomeMusica" id="txtNomeMusica" class="form-control" required>
-        </div>
-        <div class="mb-2">
-            <label for="txtBanda">Banda:</label>
-            <input type="text" name="txtBanda" id="txtBanda" class="form-control" required>
-        </div>
-        <div class="mb-2">
-            <label for="txtGenero">Genero:</label>
-            <input type="text" name="txtGenero" id="txtGenero" class="form-control" required>
-        </div>
+        <fieldset>
 
-        <div class="mb-2"><button type="submit" class="btn btn-primary">Cadastrar Musica</button></div>
+            {{ form.csrf_token() }}
+
+            <div class="mb-2">
+                <label for="arquivo">Foto de capa:</label>
+                <input type="file" class="form-control" name="arquivo" accept=".jpg, .jpeg, .png">
+            </div>
+            <div class="mb-2">
+                {{ form.nome.label(class = 'form-label') }}
+                {{ form.nome(class = 'form-control') }}
+            </div>
+            <div class="mb-2">
+                {{ form.grupo.label(class = 'form-label') }}
+                {{ form.grupo(class = 'form-control') }}
+            </div>
+            <div class="mb-2">
+                {{ form.genero.label(class = 'form-label') }}
+                {{ form.genero(class = 'form-control') }}
+            </div>
+            <div class="mb-2">
+                {{ form.cadastrar(class = 'btn btn-primary') }}
+            </div>
+        </fieldset>
     </form>
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}

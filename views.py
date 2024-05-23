@@ -1,7 +1,8 @@
 from flask import render_template, request, redirect, session, flash, url_for, send_from_directory
 from models import Musica, Usuario
 from musica import db, app
-from definicoes import recupera_imagem
+from definicoes import recupera_imagem, deletar_imagem, FormularioMusica
+import time
 
 @app.route('/')
 def listarMusicas():
@@ -14,20 +15,31 @@ def listarMusicas():
                            titulo = 'Musicas Cadastradas',
                            musicas = lista)
 
+
 @app.route('/cadmusicas')
 def cadastrarMusica():
 
     if session['usuarioLogado'] == None or 'usuarioLogado' not in session:
         return redirect(url_for('loginUser'))
 
+    form = FormularioMusica()
+
     return render_template('cadastra_musica.html',
-                           titulo = 'Cadastrar música')
+                           titulo = 'Cadastrar música',
+                           form = form)
+
 
 @app.route('/addMusica', methods = ['POST'])
 def adicionarMusica():
-    nome = request.form['txtNomeMusica']
-    banda = request.form['txtBanda']
-    genero = request.form['txtGenero']
+
+    formRecebido = FormularioMusica(request.form)
+
+    if not formRecebido.validate_on_submit():
+        return redirect(url_for('cadastrar_musica'))
+    
+    nome = formRecebido.nome.data
+    banda = formRecebido.grupo.data
+    genero = formRecebido.genero.data
 
     if Musica.query.filter_by(nome_musica = nome).first() and Musica.query.filter_by(cantor_banda = banda).first():
         flash("Musica ja cadastrada!", "alert alert-danger")
@@ -38,11 +50,21 @@ def adicionarMusica():
         db.session.commit()
 
         arquivo = request.files['arquivo']
-        pastaArquivos = app.config['UPLOAD_PASTA']
-        arquivo.save(f'{pastaArquivos}/album{novaMusica.id_musica}.jpg')
+
+        if arquivo:
+            pastaArquivo = app.config['UPLOAD_PASTA']
+            arquivoNome = arquivo.filename
+            arquivoNome = arquivoNome.split('.')
+            extensao = arquivoNome[len(arquivoNome) - 1]
+            momento = time.time()
+
+            nome_completo = f'album{novaMusica.id_musica}_{momento}.{extensao}'
+            
+            arquivo.save(f'{pastaArquivo}/{nome_completo}')
 
         flash("Musica cadastrada com sucesso", "alert alert-success")
         return redirect(url_for('cadastrarMusica'))
+
 
 @app.route('/editar/<int:id>')
 def editar(id):
@@ -51,15 +73,24 @@ def editar(id):
         return redirect(url_for('loginUser'))
 
     musicaBuscada = Musica.query.filter_by(id_musica = id).first()
+
+    form = FormularioMusica()
+    form.nome.data = musicaBuscada.nome_musica
+    form.grupo.data = musicaBuscada.cantor_banda
+    form.genero.data = musicaBuscada.genero_musica
+
     album = recupera_imagem(id)
 
     return render_template('editar_musica.html',
                            titulo = 'Editar música',
-                           musica = musicaBuscada,
+                           musica = form,
                            albumMusica = album)
+
 
 @app.route('/attMusica', methods = ['POST'])
 def atualizarMusica():
+    formRecebido = FormularioMusica(request.form)
+    
     musica = Musica.query.filter_by(id_musica = request.form['txtId']).first()
 
     musica.nome_musica = request.form['txtNomeMusica']
@@ -68,6 +99,21 @@ def atualizarMusica():
 
     db.session.add(musica)
     db.session.commit()
+
+    arquivo = request.files['arquivo']
+    
+    if arquivo:
+        pastaArquivo = app.config['UPLOAD_PASTA']
+        arquivoNome = arquivo.filename
+        arquivoNome = arquivoNome.split('.')
+        extensao = arquivoNome[len(arquivoNome) - 1]
+        momento = time.time()
+
+        nome_completo = f'album{musica.id_musica}_{momento}.{extensao}'
+
+        deletar_imagem(musica.id_musica)
+
+        arquivo.save(f'{pastaArquivo}/{nome_completo}')
 
     return redirect(url_for('listarMusicas'))
 
@@ -78,6 +124,7 @@ def excluir(id):
         return redirect(url_for('loginUser'))
     
     Musica.query.filter_by(id_musica = id).delete()
+    deletar_imagem(id)
     db.session.commit()
 
     flash("Musica excluida com sucesso", "alert alert-success")
