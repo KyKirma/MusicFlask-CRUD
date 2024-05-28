@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, session, flash, url_for, send_from_directory
-from models import Musica, Usuario
+from models import Musica
 from musica import db, app
 from definicoes import recupera_imagem, deletar_imagem, FormularioMusica
 import time
@@ -84,37 +84,42 @@ def editar(id):
     return render_template('editar_musica.html',
                            titulo = 'Editar música',
                            musica = form,
-                           albumMusica = album)
+                           albumMusica = album,
+                           id = id)
 
 
 @app.route('/attMusica', methods = ['POST'])
 def atualizarMusica():
     formRecebido = FormularioMusica(request.form)
     
-    musica = Musica.query.filter_by(id_musica = request.form['txtId']).first()
+    if formRecebido.validate_on_submit():
+        musica = Musica.query.filter_by(id_musica = request.form['txtId']).first()
 
-    musica.nome_musica = request.form['txtNomeMusica']
-    musica.cantor_banda = request.form['txtBanda']
-    musica.genero_musica = request.form['txtGenero']
+        musica.nome_musica = formRecebido.nome.data
+        musica.cantor_banda = formRecebido.grupo.data
+        musica.genero_musica = formRecebido.genero.data
 
-    db.session.add(musica)
-    db.session.commit()
+        db.session.add(musica)
+        db.session.commit()
 
-    arquivo = request.files['arquivo']
-    
-    if arquivo:
-        pastaArquivo = app.config['UPLOAD_PASTA']
-        arquivoNome = arquivo.filename
-        arquivoNome = arquivoNome.split('.')
-        extensao = arquivoNome[len(arquivoNome) - 1]
-        momento = time.time()
+        arquivo = request.files['arquivo']
+        
+        if arquivo:
+            pastaArquivo = app.config['UPLOAD_PASTA']
+            arquivoNome = arquivo.filename
+            arquivoNome = arquivoNome.split('.')
+            extensao = arquivoNome[len(arquivoNome) - 1]
+            momento = time.time()
 
-        nome_completo = f'album{musica.id_musica}_{momento}.{extensao}'
+            nome_completo = f'album{musica.id_musica}_{momento}.{extensao}'
 
-        deletar_imagem(musica.id_musica)
+            deletar_imagem(musica.id_musica)
 
-        arquivo.save(f'{pastaArquivo}/{nome_completo}')
+            arquivo.save(f'{pastaArquivo}/{nome_completo}')
 
+        flash('Musica Editada com sucesso', "alert alert-success")
+        return redirect(url_for('listarMusicas'))
+    flash('Ocorreu algum erro.', "alert alert-danger")
     return redirect(url_for('listarMusicas'))
 
 @app.route('/excluir/<int:id>')
@@ -133,27 +138,6 @@ def excluir(id):
 @app.route('/uploads/<nomeImagem>')
 def imagem(nomeImagem):
     return send_from_directory('uploads', nomeImagem)
-
-@app.route('/login')
-def loginUser():
-    return render_template('login.html')
-
-@app.route('/autenticar', methods = ['POST'])
-def autenticar():
-
-    usuario = Usuario.query.filter_by(login_usuario = request.form['txtLogin']).first()
-
-    if usuario:
-        if request.form['txtSenha'] == usuario.senha_usuario:
-            session['usuarioLogado'] = request.form['txtLogin']
-            flash(f"Usuário {usuario.nome_usuario} logado com sucesso!", "alert alert-success")
-            return redirect(url_for('listarMusicas'))     
-        else:
-            flash("Senha inválida", "alert alert-danger")
-            return redirect(url_for('loginUser'))
-    else:
-        flash("Usuário ou senha inválido", "alert alert-danger")
-        return redirect(url_for('loginUser'))
 
 @app.route('/sair')
 def sair():

@@ -8,7 +8,7 @@
 
             {{ musica.csrf_token() }}
             
-            <input type="hidden" name="txtId" value="{{ musica.id_musica }}">
+            <input type="hidden" name="txtId" value="{{ id }}">
             <div class="mb-2">
                 <img src="{{ url_for('imagem', nomeImagem = albumMusica) }}" class="rounded" alt="album" style="height: 200px; width: 200px; max-width: 100%;">
             </div>

@@ -1,0 +1,63 @@
+{% extends 'padraoLoginCadastro.html' %}
+
+{% block conteudo %}
+<div class="row gx-5 m-auto">
+    <div class="col">
+        <h1 class="text-center">Cadastrar novo Usuario</h1>
+    </div>
+</div>
+<div class="row gx-5 m-auto">
+    <div class="col">
+        <div class="card m-2">
+            <form method="post" action="/addUsuario" class="m-2">
+                {{ form.csrf_token() }}
+                <fieldset>
+                    <div class="mb-2">
+                        {{ form.nome.label(class='form-label') }}
+                        {{ form.nome(class = 'form-control') }}
+                    </div>
+                    <div class="mb-2">
+                        {{ form.usuario.label(class="form-label") }}
+                        {{ form.usuario(class = 'form-control') }}
+                    </div>
+                    <div class="mb-2">
+                        {{ form.senha.label(class = 'form-label')}}
+                        <div class="input-group">
+                            {{ form.senha(class = 'form-control', id= 'password') }}
+                            <button class="btn btn-outline-secondary" type="button" id="button-addon2">
+                                <img src="https://www.svgrepo.com/show/525332/eye-closed.svg" id="imgPassword" class="rounded" alt="album" style="height: 20px; width: 20px; max-width: 100%;">
+                            </button>
+                        </div>
+                    </div>
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            <ul class=flashes style="list-style-type: none; padding-left: 0px;">
+                                {% for category, message in messages %}
+                                    <li class="{{ category }}">{{ message }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endwith %}
+                    <div class="mb-2">
+                        {{ form.cadastrar(class='btn btn-primary') }}
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    const senhaInput = document.getElementById('password');
+    const mostrarSenhaButton = document.getElementById('button-addon2');
+    const senhaImg = document.getElementById('imgPassword');
+    mostrarSenhaButton.addEventListener('click', function() {
+        if (senhaInput.type === 'password') {
+            senhaInput.type = 'text';
+            senhaImg.src = 'https://www.svgrepo.com/show/525334/eye.svg';
+        } else {
+            senhaInput.type = 'password';
+            senhaImg.src = 'https://www.svgrepo.com/show/525332/eye-closed.svg';
+        }
+    });
+</script>
+{% endblock %}

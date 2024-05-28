@@ -1,17 +1,16 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-import pip
+from flask_wtf.csrf import CSRFProtect
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 db = SQLAlchemy(app)
+csrf = CSRFProtect(app)
 
-from views import *
+from musicaViews import *
+from usuarioViews import *
 
 if __name__ == '__main__':
-    try:
-        pip.main(['install', '-r', 'requirements.txt'])
-    except Exception as e:
-        print(f"Erro ao instalar pacotes: {e}")
-    finally:
-        app.run(debug = True)
+    with app.app_context():
+        db.create_all()
+    app.run(debug = True)
