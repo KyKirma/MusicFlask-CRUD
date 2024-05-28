@@ -16,12 +16,13 @@ def autenticar():
     form = FormularioUsuario(request.form)
 
     usuario = Usuario.query.filter_by(login_usuario = form.usuario.data).first()
-    senha = check_password_hash(usuario.senha_usuario, form.senha.data)
 
-    if usuario and senha:
-        session['usuarioLogado'] = usuario.login_usuario
-        flash(f"Usuário {usuario.nome_usuario} logado com sucesso!", "alert alert-success")
-        return redirect(url_for('listarMusicas'))
+    if usuario:
+        senha = check_password_hash(usuario.senha_usuario, form.senha.data)
+        if senha:
+            session['usuarioLogado'] = usuario.login_usuario
+            flash(f"Usuário {usuario.nome_usuario} logado com sucesso!", "alert alert-success")
+            return redirect(url_for('listarMusicas'))
 
     flash("Usuário ou senha inválido", "alert alert-danger")
     return redirect(url_for('loginUser'))
