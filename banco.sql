@@ -1,4 +1,4 @@
-CREATE DATABASE playmusica;
+CREATE DATABASE IF NOT EXISTS playmusica;
 USE playmusica;
 
 CREATE TABLE musica(
